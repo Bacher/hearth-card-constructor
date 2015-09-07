@@ -4,30 +4,94 @@
     <meta charset="UTF-8">
     <title></title>
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/cards-controller.css">
+    <link rel="stylesheet" href="styles/card-controller.css">
     <script src="bower_components/angular/angular.min.js"></script>
     <script src="bower_components/angular-resource/angular-resource.min.js"></script>
     <script src="js/main.js"></script>
+    <script src="js/cards-controller.es6"></script>
+    <script src="js/card-controller.es6"></script>
 </head>
 <body>
-    <div ng-controller="CardsController as cc">
+    <div ng-controller="CardsController" class="cards-panel">
 
-        <div class="cards-panel">
+        <div class="card-filters">
+            <label ng-repeat="(id, cardType) in cardTypes">
+                <input type="radio" name="card-type" ng-checked="id === filter.cardType" ng-click="selectCardType(id)">
+                {{cardType}}
+            </label>
 
-            <div class="card-filters">
-                <label ng-repeat="(id, cardType) in cardTypes">
-                    <input type="radio" name="card-type" ng-checked="id === filter.cardType" ng-click="selectCardType(id)">
-                    {{cardType}}
-                </label>
+            <img ng-repeat="(id, clas) in classes" class="class-icon {{ filter.cardClass === id ? 'selected' : '' }}" ng-src="images/{{clas}}.png" ng-click="selectCardClass(id)">
 
-                <img ng-repeat="(id, clas) in classes" class="class-icon {{ filter.cardClass === id ? 'selected' : '' }}" ng-src="images/{{clas}}.png" ng-click="selectCardClass(id)">
+        </div>
 
+        <div class="cards">
+            <div class="card-preview" ng-repeat="card in cards" ng-click="showDetails(card)">
+                <img ng-src="http://media-hearth.cursecdn.com/avatars/{{card.pic}}.png">
             </div>
+        </div>
+    </div>
 
-            <div class="cards">
-                <div class="card-preview" ng-repeat="card in cards">
-                    <img ng-src="http://media-hearth.cursecdn.com/avatars/{{card.pic}}.png">
+    <div ng-controller="CardController" class="card-panel">
+        <img ng-if="card.pic" class="card-image" ng-src="http://media-hearth.cursecdn.com/avatars/{{card.pic}}.png">
+        <label class="line">ID: {{card.id}}</label>
+        <label class="line">Picture: <input ng-model="card.url" ng-change="extractCardPic()"></label>
+        <label class="line">Name: <input ng-model="card.name"></label>
+
+        <label class="line">Type:
+            <select ng-model="card.type" ng-options="type.id as type.name for type in cardTypes"></select>
+        </label>
+        <label class="line">Flags:
+            <input ng-model="card.flags">
+        </label>
+
+        <label>Targets: <input ng-model="card.targetsType" placeholder="not-need"></label>
+
+        <div class="object" ng-show="card.type === 1 || card.type === 3" style="margin-top:44px;">
+            Object:
+
+            <label class="line">Attack:
+                <input ng-model="card.object.attack" size="4">
+            </label>
+
+            <label class="line" ng-show="card.type === 1">Max Hp:
+                <input ng-model="card.object.maxHp" size="4">
+            </label>
+
+            <label class="line" ng-show="card.type === 3">Durability:
+                <input ng-model="card.object.durability" size="4">
+            </label>
+
+            <label class="line">Flags:
+                <input ng-model="card.object.flags">
+            </label>
+
+            <div style="margin-top:5px;">Events:
+                <div ng-repeat="(eventName, events) in card.object.events" class="event">
+                    {{eventName}}:
+                    <button ng-click="addField(eventName)">+</button>
+                    <label ng-repeat="event in events" class="line">
+                        <input ng-value="event.eventName" size="20" ng-show="eventName === 'custom'">
+                        <input ng-model="event.command" size="30">
+                        <input ng-model="event.targetsType" size="30">
+                    </label>
                 </div>
             </div>
+
+        </div>
+
+        <div class="spell" ng-show="card.type === 2">
+            Spell:
+            <label class="line" ng-repeat="act in card.acts">
+                <input ng-model="act.actName">
+                <input ng-model="act.targetsType">
+            </label>
+
+        </div>
+
+        <div class="controls">
+            <button ng-click="saveCard()">Save</button>
+            <button ng-click="newCard()">New</button>
         </div>
 
     </div>
