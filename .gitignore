@@ -1,0 +1,10 @@
+/server/node_modules/
+/www/bower_components/
+
+
+/server/**/*.js
+/server/**/*.js.map
+
+/www/js/**/*.js
+/www/js/**/*.js.map
+/www/styles/**/*.css
