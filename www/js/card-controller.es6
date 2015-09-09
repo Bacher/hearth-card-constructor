@@ -32,7 +32,7 @@ angular.module('cardsApp')
             },
 
             spell: {
-                acts: []
+                acts: [{}]
             }
         });
     };
@@ -73,7 +73,11 @@ angular.module('cardsApp')
                     };
 
                     if (eventTypeName === 'custom') {
-                        act.eventName = event.eventName;
+                        const eventMath = event.event.match(/([^(]+)(?:\(([^)]+)\))?/);
+                        act.event = {
+                            name: eventMath[1],
+                            params: eventMath[2] ? eventMath[2].split(',').map(tryParseNumber) : []
+                        }
                     }
 
                     return act;
@@ -121,6 +125,17 @@ angular.module('cardsApp')
 
     $scope.removeField = (eventTypeName, index) => {
         $scope.card.minion.events[eventTypeName].splice(index, 1);
+    };
+
+    $scope.addSpellAct = () => {
+        $scope.card.spell.acts.push({
+            //command: '',
+            //targetsType: ''
+        });
+    };
+
+    $scope.removeSpellAct = (id) => {
+        $scope.card.spell.acts.splice(id, 1);
     };
 
     $rootScope.$on('select-card', (event, card) => {
@@ -215,7 +230,7 @@ angular.module('cardsApp')
     }
 
     function parseActCommands(command) {
-        const acts = command.split(/\s*,\s*/);
+        const acts = command.split(/\s*;\s*/);
 
         return acts.map(act => {
             const match = act.match(/^([^(]+)(?:\(([^)]+)\))?$/);
@@ -245,13 +260,24 @@ angular.module('cardsApp')
             }
 
             return command;
-        }).join(',');
+        }).join(';');
     }
 
-    function getRawAct(event) {
+    function getRawAct(act) {
+        var event = null;
+
+        if (act.event) {
+            event = act.event.name;
+
+            if (act.event.params.length) {
+                event += '(' + act.event.params.join(',') + ')';
+            }
+        }
+
         return {
-            command: getRawCommand(event.acts),
-            targetsType: getRawTargetsType(event.targetsType)
+            event: event,
+            command: getRawCommand(act.acts),
+            targetsType: getRawTargetsType(act.targetsType)
         };
     }
 

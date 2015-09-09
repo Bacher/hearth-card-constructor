@@ -85,7 +85,7 @@
                     {{eventTypeName}}:
                     <button ng-click="addField(eventTypeName)">+</button>
                     <label ng-repeat="(index, event) in events" class="line">
-                        <input ng-value="event.eventName" size="20" ng-show="eventTypeName === 'custom'" placeholder="event">
+                        <input ng-model="event.event" size="20" ng-show="eventTypeName === 'custom'" placeholder="event">
                         <input ng-model="event.command" size="30" placeholder="acts">
                         <input ng-model="event.targetsType" size="30" placeholder="{{eventTypeName === 'battlecry' ? 'inherit' : 'targets'}}">
                         <button ng-click="removeField(eventTypeName, index)">x</button>
@@ -96,10 +96,11 @@
         </div>
 
         <div class="spell" ng-show="card.type === 2">
-            Spell:
-            <label class="line" ng-repeat="act in card.spell.acts">
+            Spell: <button ng-click="addSpellAct()">Add</button>
+            <label class="line" ng-repeat="(id, act) in card.spell.acts">
                 <input ng-model="act.command" size="30" placeholder="acts">
                 <input ng-model="act.targetsType" size="30" placeholder="inherit">
+                <button ng-click="removeSpellAct(id)">x</button>
             </label>
 
         </div>
