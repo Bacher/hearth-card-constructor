@@ -1,5 +1,6 @@
 angular.module('cardsApp')
 .controller('CardsController', ['$rootScope', '$scope', 'Cards', function($rootScope, $scope, Cards) {
+
     this.cards = Cards.query();
 
     $scope.selectCardType = cardType => {
@@ -62,6 +63,10 @@ angular.module('cardsApp')
         cardType: 0,
         cardClass: 0
     };
+
+    $rootScope.$on('add-card-preview', (event, card) => {
+        $scope.cards.push(card);
+    });
 
     $scope.cards = [];
 

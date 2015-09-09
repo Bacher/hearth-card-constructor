@@ -19,6 +19,19 @@ const CLASSES = {
     priest: 9
 };
 
+const CLASSES_L = [
+    'neutral',
+    'warrior',
+    'shaman',
+    'rogue',
+    'paladin',
+    'hunter',
+    'druid',
+    'warlock',
+    'mage',
+    'priest'
+];
+
 angular.module('cardsService', ['ngResource'])
 .factory('Cards', ['$resource', function($resource) {
     return $resource('/cards.json', {}, {

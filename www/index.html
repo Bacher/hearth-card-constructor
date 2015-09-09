@@ -21,7 +21,13 @@
                 {{cardType}}
             </label>
 
-            <img ng-repeat="(id, clas) in classes" class="class-icon {{ filter.cardClass === id ? 'selected' : '' }}" ng-src="images/{{clas}}.png" ng-click="selectCardClass(id)">
+            <label>
+                <img ng-repeat="(id, clas) in classes"
+                     ng-class="'class-icon' + (filter.cardClass === id ? ' selected' : '')"
+                     ng-src="images/{{clas}}.png"
+                     ng-click="selectCardClass(id)"
+                     style="margin-bottom: -6px">
+            </label>
 
         </div>
 
@@ -37,9 +43,17 @@
         <label class="line">ID: {{card.id}}</label>
         <label class="line">Picture: <input ng-model="card.url" ng-change="extractCardPic()"></label>
         <label class="line">Name: <input ng-model="card.name"></label>
+        <label class="line">Cost: <input ng-model="card.cost" type="number"></label>
+
+        <label class="line">
+            <img ng-repeat="(classId, clas) in classes"
+                 ng-class="'class-icon' + (card.clas === classId ? ' selected' : '')"
+                 ng-src="/images/{{clas}}.png"
+                 ng-click="selectClass(classId)">
+        </label>
 
         <label class="line">Type:
-            <select ng-model="card.type" ng-options="type.id as type.name for type in cardTypes"></select>
+            <select ng-model="card.type" ng-options="type.id as type.name for type in cardTypes" convert-to-number></select>
         </label>
         <label class="line">Flags:
             <input ng-model="card.flags">
@@ -51,15 +65,15 @@
             Object:
 
             <label class="line">Attack:
-                <input ng-model="card.object.attack" size="4">
+                <input ng-model="card.object.attack" type="number" size="4">
             </label>
 
             <label class="line" ng-show="card.type === 1">Max Hp:
-                <input ng-model="card.object.maxHp" size="4">
+                <input ng-model="card.object.maxHp" type="number" size="4">
             </label>
 
             <label class="line" ng-show="card.type === 3">Durability:
-                <input ng-model="card.object.durability" size="4">
+                <input ng-model="card.object.durability" type="number" size="4">
             </label>
 
             <label class="line">Flags:
@@ -67,13 +81,14 @@
             </label>
 
             <div style="margin-top:5px;">Events:
-                <div ng-repeat="(eventName, events) in card.object.events" class="event">
-                    {{eventName}}:
-                    <button ng-click="addField(eventName)">+</button>
-                    <label ng-repeat="event in events" class="line">
-                        <input ng-value="event.eventName" size="20" ng-show="eventName === 'custom'">
-                        <input ng-model="event.command" size="30">
-                        <input ng-model="event.targetsType" size="30">
+                <div ng-repeat="(eventTypeName, events) in card.object.events" class="event">
+                    {{eventTypeName}}:
+                    <button ng-click="addField(eventTypeName)">+</button>
+                    <label ng-repeat="(index, event) in events" class="line">
+                        <input ng-value="event.eventName" size="20" ng-show="eventTypeName === 'custom'" placeholder="event">
+                        <input ng-model="event.command" size="30" placeholder="acts">
+                        <input ng-model="event.targetsType" size="30" placeholder="{{eventTypeName === 'battlecry' ? 'inherit' : 'targets'}}">
+                        <button ng-click="removeField(eventTypeName, index)">x</button>
                     </label>
                 </div>
             </div>
@@ -82,9 +97,9 @@
 
         <div class="spell" ng-show="card.type === 2">
             Spell:
-            <label class="line" ng-repeat="act in card.acts">
-                <input ng-model="act.actName">
-                <input ng-model="act.targetsType">
+            <label class="line" ng-repeat="act in card.spell.acts">
+                <input ng-model="act.command" size="30" placeholder="acts">
+                <input ng-model="act.targetsType" size="30" placeholder="inherit">
             </label>
 
         </div>

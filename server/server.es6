@@ -15,9 +15,7 @@ const CARDS_FILENAME = '../../Hearthstone/server/data/cards.json';
 var cards = JSON.parse(fs.readFileSync(CARDS_FILENAME).toString());
 
 //cards.forEach(card => {
-//    if (card.minion) {
-//        card.minion.events = card.minion.events || {};
-//    }
+//
 //});
 //writeCards();
 
@@ -47,21 +45,27 @@ const server = app.listen(8088, function () {
     app.post('/update.json', (req, res) => {
 
         const updatedCard = req.body;
-        var status;
+
+        if (isNaN(Number(updatedCard.id))) {
+            maxCardId++;
+            updatedCard.id = maxCardId;
+        }
 
         const index = _.findIndex(cards, card => card.id === updatedCard.id);
 
+        const response = {};
+
         if (index !== -1) {
-            status = 'updated';
+            response.status = 'updated';
+            response.id = updatedCard.id;
             cards[index] = updatedCard;
         } else {
-            status = 'created';
+            response.status = 'created';
+            response.id = updatedCard.id;
             cards.push(updatedCard);
         }
 
-        res.json({
-            status
-        });
+        res.json(response);
 
         cards = cards.sort((card1, card2) => {
             if (card1.cost !== card2.cost) {
@@ -75,11 +79,7 @@ const server = app.listen(8088, function () {
 
         writeCards();
 
-        if (updatedCard.id > maxCardId) {
-            maxCardId = updatedCard.id;
-        }
-
-        console.log('Card id:%s %s.', updatedCard.id, status);
+        console.log('Card id: %s %s.', response.id, response.status);
     });
 });
 

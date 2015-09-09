@@ -1,6 +1,9 @@
 
 angular.module('cardsApp')
-.controller('CardController', ['$rootScope', '$scope', function($rootScope, $scope) {
+.controller('CardController', ['$rootScope', '$scope', '$http', function($rootScope, $scope, $http) {
+
+    $scope.classes = CLASSES_L;
+
     $scope.cardTypes = [
         { name: 'minion', id: 1 },
         { name: 'spell', id: 2 },
@@ -42,33 +45,30 @@ angular.module('cardsApp')
         }
     };
 
+    $scope.selectClass = classId => {
+        $scope.card.clas = classId;
+    };
+
     $scope.saveCard = () => {
-        const card = this.card;
+        const card = angular.copy($scope.card);
+
         const newCard = {};
 
-        ['id', 'pic', 'name', 'clas', 'type'].forEach(propName => {
+        ['id', 'name', 'cost', 'pic', 'clas', 'type'].forEach(propName => {
             newCard[propName] = card[propName];
         });
 
+        newCard.targetsType = parseTargetsType(card.targetsType);
+
+        newCard.flags = getFlags(card.flags);
+
         if (card.type === CARD_TYPES.minion || card.type === CARD_TYPES.weapon) {
-            if (card.type === CARD_TYPES.minion) {
-                newCard.minion = card.object;
-
-                delete newCard.minion.durability;
-            } else {
-                newCard.weapon = card.object;
-                delete newCard.weapon.maxHp;
-            }
-
-            for (var eventTypeName in newCard.object.events) {
-                const events = newCard.object.events;
+            for (var eventTypeName in card.object.events) {
+                const events = card.object.events;
 
                 events[eventTypeName] = events[eventTypeName].map(event => {
-                    const command = parseActCommand(event.command);
-
                     const act = {
-                        actName: command.name,
-                        actParams: command.params,
+                        acts: parseActCommands(event.command),
                         targetsType: parseTargetsType(event.targetsType)
                     };
 
@@ -78,15 +78,49 @@ angular.module('cardsApp')
 
                     return act;
                 });
+
+                if (!events[eventTypeName].length) {
+                    delete events[eventTypeName];
+                }
             }
 
-            delete card.object;
+            card.object.flags = getFlags(card.object.flags);
+
+            if (card.type === CARD_TYPES.minion) {
+                newCard.minion = card.object;
+
+                delete newCard.minion.durability;
+            } else {
+                newCard.weapon = card.object;
+                delete newCard.weapon.maxHp;
+            }
+
+        } else if (card.type === CARD_TYPES.spell) {
+            newCard.spell = {};
+
+            newCard.spell.acts = card.spell.acts.map(act => {
+                return {
+                    acts: parseActCommands(act.command),
+                    targetsType: parseTargetsType(act.targetsType)
+                };
+            });
         }
 
+        $http.post('/update.json', newCard)
+            .success(data => {
+                if (data.status === 'created') {
+                    newCard.id = data.id;
+                    $rootScope.$broadcast('add-card-preview', newCard);
+                }
+            });
     };
 
-    $scope.addField = (eventName) => {
-        $scope.card.minion.events[eventName].push({});
+    $scope.addField = (eventTypeName) => {
+        $scope.card.minion.events[eventTypeName].push({});
+    };
+
+    $scope.removeField = (eventTypeName, index) => {
+        $scope.card.minion.events[eventTypeName].splice(index, 1);
     };
 
     $rootScope.$on('select-card', (event, card) => {
@@ -102,10 +136,10 @@ angular.module('cardsApp')
 
         card.flags = card.flags && card.flags.join(',') || '';
 
+        card.targetsType = getRawTargetsType(card.targetsType);
+
         if (card.type === CARD_TYPES.minion) {
             card.object = card.minion;
-
-            card.targetsType = getRawTargetsType(card.targetsType);
 
         } else if (card.type === CARD_TYPES.weapon) {
             card.object = card.weapon;
@@ -119,21 +153,24 @@ angular.module('cardsApp')
 
             ['battlecry', 'deathrattle', 'end-turn', 'start-turn', 'aura', 'custom'].forEach(eventTypeName => {
                 if (events[eventTypeName]) {
-                    if (!Array.isArray(events[eventTypeName])) {
-                        events[eventTypeName] = [events[eventTypeName]];
-                    }
-
                     events[eventTypeName] = events[eventTypeName].map(event => getRawAct(event));
                 } else {
                     events[eventTypeName] = [];
                 }
             });
+
+        } else if (card.type === CARD_TYPES.spell) {
+            card.spell.acts = card.spell.acts.map(act => getRawAct(act));
         }
 
         return card;
     }
 
     function parseTargetsType(targetsTypeRaw) {
+        if (!targetsTypeRaw) {
+            return;
+        }
+
         const match = targetsTypeRaw.match(/^([^\.]+)(?:\.(.+))?$/);
         const targetsDetails = match[1].split('&');
 
@@ -177,13 +214,16 @@ angular.module('cardsApp')
         return raw;
     }
 
-    function parseActCommand(command) {
-        const match = command.match(/^([^(]+)(?:\(([^)]+)\))?$/);
+    function parseActCommands(command) {
+        const acts = command.split(/\s*,\s*/);
 
-        return {
-            name: match[1],
-            params: (match[2] || '').split(/\s*,\s*/).map(tryParseNumber)
-        }
+        return acts.map(act => {
+            const match = act.match(/^([^(]+)(?:\(([^)]+)\))?$/);
+            return {
+                name: match[1],
+                params: (match[2] || '').split(/\s*,\s*/).map(tryParseNumber)
+            }
+        });
     }
 
     function tryParseNumber(value) {
@@ -196,22 +236,27 @@ angular.module('cardsApp')
         }
     }
 
-    function getRawCommand(act) {
-        // fixme
-        var raw = act.actName || act.name;
+    function getRawCommand(acts) {
+        return acts.map(act => {
+            var command = act.name;
 
-        if (act.params.length) {
-            raw += '(' + act.params.join(',') + ')';
-        }
+            if (act.params.length) {
+                command += '(' + act.params.join(',') + ')';
+            }
 
-        return raw;
+            return command;
+        }).join(',');
     }
 
     function getRawAct(event) {
         return {
-            command: getRawCommand(event),
+            command: getRawCommand(event.acts),
             targetsType: getRawTargetsType(event.targetsType)
         };
+    }
+
+    function getFlags(flagsString) {
+        return flagsString && flagsString.split(',') || [];
     }
 
 }]);
