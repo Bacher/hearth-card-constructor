@@ -61,7 +61,7 @@
 
         <label>Targets: <input ng-model="card.targetsType" placeholder="not-need"></label>
 
-        <div class="object" ng-show="card.type === 1 || card.type === 3" style="margin-top:44px;">
+        <div class="part object" ng-show="card.type === 1 || card.type === 3" style="margin-top:44px;">
             Object:
 
             <label class="line">Attack:
@@ -95,14 +95,23 @@
 
         </div>
 
-        <div class="spell" ng-show="card.type === 2">
+        <div class="part spell" ng-show="card.type === 2">
             Spell: <button ng-click="addSpellAct()">Add</button>
             <label class="line" ng-repeat="(id, act) in card.spell.acts">
                 <input ng-model="act.command" size="30" placeholder="acts">
                 <input ng-model="act.targetsType" size="30" placeholder="inherit">
                 <button ng-click="removeSpellAct(id)">x</button>
             </label>
+        </div>
 
+        <div class="part trap" ng-show="card.type === 4">
+            Trap: <button ng-click="addTrapAct()">Add</button>
+            <label class="line" ng-repeat="(id, event) in card.trap.events.custom">
+                <input ng-model="event.event" size="20" placeholder="event">
+                <input ng-model="event.command" size="30" placeholder="acts">
+                <input ng-model="event.targetsType" size="30" placeholder="inherit">
+                <button ng-click="removeTrapAct(id)">x</button>
+            </label>
         </div>
 
         <div class="controls">

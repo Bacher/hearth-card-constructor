@@ -33,6 +33,12 @@ angular.module('cardsApp')
 
             spell: {
                 acts: [{}]
+            },
+
+            trap: {
+                events: {
+                    custom: [{}]
+                }
             }
         });
     };
@@ -42,6 +48,8 @@ angular.module('cardsApp')
 
         if (match) {
             $scope.card.pic = $scope.card.url = match[1];
+        } else {
+            $scope.card.pic = $scope.card.url;
         }
     };
 
@@ -73,11 +81,7 @@ angular.module('cardsApp')
                     };
 
                     if (eventTypeName === 'custom') {
-                        const eventMath = event.event.match(/([^(]+)(?:\(([^)]+)\))?/);
-                        act.event = {
-                            name: eventMath[1],
-                            params: eventMath[2] ? eventMath[2].split(',').map(tryParseNumber) : []
-                        }
+                        act.event = parseCustomEvent(event.event);
                     }
 
                     return act;
@@ -108,12 +112,24 @@ angular.module('cardsApp')
                     targetsType: parseTargetsType(act.targetsType)
                 };
             });
+        } else if (card.type === CARD_TYPES.trap) {
+            newCard.trap = {
+                events: {}
+            };
+
+            newCard.trap.events['custom'] = card.trap.events['custom'].map(act => {
+                return {
+                    event: parseCustomEvent(act.event),
+                    acts: parseActCommands(act.command),
+                    targetsType: parseTargetsType(act.targetsType)
+                };
+            });
         }
 
         $http.post('/update.json', newCard)
             .success(data => {
                 if (data.status === 'created') {
-                    newCard.id = data.id;
+                    $scope.card = data.id;
                     $rootScope.$broadcast('add-card-preview', newCard);
                 }
             });
@@ -128,14 +144,19 @@ angular.module('cardsApp')
     };
 
     $scope.addSpellAct = () => {
-        $scope.card.spell.acts.push({
-            //command: '',
-            //targetsType: ''
-        });
+        $scope.card.spell.acts.push({});
     };
 
     $scope.removeSpellAct = (id) => {
         $scope.card.spell.acts.splice(id, 1);
+    };
+
+    $scope.addTrapAct = () => {
+        $scope.card.trap.acts.push({});
+    };
+
+    $scope.removeTrapAct = (id) => {
+        $scope.card.trap.acts.splice(id, 1);
     };
 
     $rootScope.$on('select-card', (event, card) => {
@@ -176,6 +197,9 @@ angular.module('cardsApp')
 
         } else if (card.type === CARD_TYPES.spell) {
             card.spell.acts = card.spell.acts.map(act => getRawAct(act));
+
+        } else if (card.type === CARD_TYPES.trap) {
+            card.trap.events['custom'] = card.trap.events['custom'].map(act => getRawAct(act));
         }
 
         return card;
@@ -244,7 +268,7 @@ angular.module('cardsApp')
             const match = act.match(/^([^(]+)(?:\(([^)]+)\))?$/);
             return {
                 name: match[1],
-                params: (match[2] || '').split(/\s*,\s*/).map(tryParseNumber)
+                params: match[2] && match[2].split(/\s*,\s*/).map(tryParseNumber) || []
             }
         });
     }
@@ -291,6 +315,15 @@ angular.module('cardsApp')
 
     function getFlags(flagsString) {
         return flagsString && flagsString.split(',') || [];
+    }
+
+    function parseCustomEvent(event) {
+        const eventMath = event.match(/([^(]+)(?:\(([^)]+)\))?/);
+
+        return {
+            name: eventMath[1],
+            params: eventMath[2] ? eventMath[2].split(',').map(tryParseNumber) : []
+        }
     }
 
 }]);
