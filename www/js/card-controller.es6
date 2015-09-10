@@ -186,6 +186,10 @@ angular.module('cardsApp')
             return;
         }
 
+        if (targetsTypeRaw === 'not-need') {
+            return 'not-need';
+        }
+
         const match = targetsTypeRaw.match(/^([^\.]+)(?:\.(.+))?$/);
         const targetsDetails = match[1].split('&');
 
@@ -214,19 +218,23 @@ angular.module('cardsApp')
             return null;
         }
 
-        var raw = targetsType.names.join('&');
+        if (targetsType === 'not-need') {
+            return 'not-need';
+        } else {
+            var raw = targetsType.names.join('&');
 
-        if (targetsType.modificators) {
-            targetsType.modificators.forEach(mod => {
-                raw += '.' + mod.name;
+            if (targetsType.modificators) {
+                targetsType.modificators.forEach(mod => {
+                    raw += '.' + mod.name;
 
-                if (mod.params) {
-                    raw += '(' + mod.params.join(',') + ')';
-                }
-            });
+                    if (mod.params) {
+                        raw += '(' + mod.params.join(',') + ')';
+                    }
+                });
+            }
+
+            return raw;
         }
-
-        return raw;
     }
 
     function parseActCommands(command) {
