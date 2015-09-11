@@ -73,6 +73,10 @@ angular.module('cardsApp')
             newCard[propName] = card[propName];
         });
 
+        if (card.customAction) {
+            newCard.customAction = card.customAction;
+        }
+
         newCard.targetsType = parseTargetsType(card.targetsType);
 
         newCard.flags = getFlags(card.flags);

@@ -45,6 +45,10 @@
         <label class="line">Name: <input ng-model="card.name"></label>
         <label class="line">Cost: <input ng-model="card.cost" type="number"></label>
 
+        <label class="line">Type:
+            <select ng-model="card.type" ng-options="type.id as type.name for type in cardTypes" convert-to-number></select>
+        </label>
+
         <label class="line">
             <img ng-repeat="(classId, clas) in classes"
                  ng-class="'class-icon' + (card.clas === classId ? ' selected' : '')"
@@ -52,12 +56,11 @@
                  ng-click="selectClass(classId)">
         </label>
 
-        <label class="line">Type:
-            <select ng-model="card.type" ng-options="type.id as type.name for type in cardTypes" convert-to-number></select>
-        </label>
         <label class="line">Flags:
             <input ng-model="card.flags">
         </label>
+
+        <label class="line">Custom action: <input ng-model="card.customAction"></label>
 
         <label>Targets: <input ng-model="card.targetsType" placeholder="not-need"></label>
 
