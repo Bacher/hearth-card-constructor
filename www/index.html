@@ -81,7 +81,7 @@
             </label>
 
             <label class="line" ng-show="card.type === 1">Race:
-                <select ng-model="card.object.race" ng-options="id as race for (id, race) in races" convert-to-number></select>
+                <select ng-model="card.object.race" ng-options="race.id as race.name for race in races" convert-to-number></select>
             </label>
 
             <div style="margin-top:5px;">Events:

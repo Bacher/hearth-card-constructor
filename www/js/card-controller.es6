@@ -3,7 +3,13 @@ angular.module('cardsApp')
 .controller('CardController', ['$rootScope', '$scope', '$http', function($rootScope, $scope, $http) {
 
     $scope.classes = CLASSES_L;
-    $scope.races = RACES_L;
+    $scope.races = [];
+    RACES_L.forEach((race, i) => {
+        $scope.races.push({
+            id: i,
+            name: race
+        });
+    });
 
     $scope.cardTypes = [
         { name: 'minion', id: 1 },
@@ -96,7 +102,6 @@ angular.module('cardsApp')
             card.object.flags = getFlags(card.object.flags);
 
             if (card.type === CARD_TYPES.minion) {
-                card.object.race = Number(card.object.race);
                 newCard.minion = card.object;
 
                 delete newCard.minion.durability;
