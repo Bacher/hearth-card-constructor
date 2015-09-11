@@ -80,6 +80,10 @@
                 <input ng-model="card.object.flags">
             </label>
 
+            <label class="line" ng-show="card.type === 1">Race:
+                <select ng-model="card.object.race" ng-options="id as race for (id, race) in races" convert-to-number></select>
+            </label>
+
             <div style="margin-top:5px;">Events:
                 <div ng-repeat="(eventTypeName, events) in card.object.events" class="event">
                     {{eventTypeName}}:

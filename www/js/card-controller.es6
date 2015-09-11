@@ -3,6 +3,7 @@ angular.module('cardsApp')
 .controller('CardController', ['$rootScope', '$scope', '$http', function($rootScope, $scope, $http) {
 
     $scope.classes = CLASSES_L;
+    $scope.races = RACES_L;
 
     $scope.cardTypes = [
         { name: 'minion', id: 1 },
@@ -95,6 +96,7 @@ angular.module('cardsApp')
             card.object.flags = getFlags(card.object.flags);
 
             if (card.type === CARD_TYPES.minion) {
+                card.object.race = Number(card.object.race);
                 newCard.minion = card.object;
 
                 delete newCard.minion.durability;
@@ -131,6 +133,8 @@ angular.module('cardsApp')
                 if (data.status === 'created') {
                     $scope.card = data.id;
                     $rootScope.$broadcast('add-card-preview', newCard);
+
+                    $scope.newCard();
                 }
             });
     };

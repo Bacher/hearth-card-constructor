@@ -32,6 +32,28 @@ const CLASSES_L = [
     'priest'
 ];
 
+const RACES = {
+    general: 0,
+    beast: 1,
+    demon: 2,
+    dragon: 3,
+    mech: 4,
+    murloc: 5,
+    pirate: 6,
+    totem: 7
+};
+
+const RACES_L = [
+    'general',
+    'beast',
+    'demon',
+    'dragon',
+    'mech',
+    'murloc',
+    'pirate',
+    'totem'
+];
+
 angular.module('cardsService', ['ngResource'])
 .factory('Cards', ['$resource', function($resource) {
     return $resource('/cards.json', {}, {
