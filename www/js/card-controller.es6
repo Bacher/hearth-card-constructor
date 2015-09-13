@@ -77,6 +77,10 @@ angular.module('cardsApp')
             newCard.customAction = card.customAction;
         }
 
+        if (card.conditions) {
+            newCard.conditions = card.conditions.split(',');
+        }
+
         newCard.targetsType = parseTargetsType(card.targetsType);
 
         newCard.flags = getFlags(card.flags);
@@ -186,6 +190,8 @@ angular.module('cardsApp')
         card.flags = card.flags && card.flags.join(',') || '';
 
         card.targetsType = getRawTargetsType(card.targetsType);
+
+        card.conditions = card.conditions && card.conditions.join(',') || '';
 
         if (card.type === CARD_TYPES.minion) {
             card.object = card.minion;
