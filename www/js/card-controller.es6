@@ -144,7 +144,7 @@ angular.module('cardsApp')
         $http.post('/update.json', newCard)
             .success(data => {
                 if (data.status === 'created') {
-                    $scope.card = data.id;
+                    $scope.card = newCard.id = data.id;
                     $rootScope.$broadcast('add-card-preview', newCard);
 
                     $scope.newCard();
