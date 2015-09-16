@@ -32,8 +32,10 @@
         </div>
 
         <div class="cards">
-            <div class="card-preview" ng-repeat="card in cards" ng-click="showDetails(card)">
-                <img ng-src="http://media-hearth.cursecdn.com/avatars/{{card.pic}}.png">
+            <div ng-repeat="cardPack in cards" style="margin-bottom: 70px">
+                <div class="card-preview" ng-repeat="card in cardPack" ng-click="showDetails(card)">
+                    <img ng-src="http://media-hearth.cursecdn.com/avatars/{{card.pic}}.png">
+                </div>
             </div>
         </div>
     </div>

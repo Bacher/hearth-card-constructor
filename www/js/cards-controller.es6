@@ -14,7 +14,7 @@ angular.module('cardsApp')
     };
 
     $scope.drawCards = () => {
-        $scope.cards = this.cards.filter(card => {
+         const cards = this.cards.filter(card => {
             const filter = $scope.filter;
             if (filter.cardClass) {
                 const clas = filter.cardClass - 1;
@@ -31,6 +31,8 @@ angular.module('cardsApp')
 
             return true;
         });
+
+        $scope.cards = splitOnManaCostGroups(cards);
     };
 
     $scope.showDetails = card => {
@@ -65,11 +67,27 @@ angular.module('cardsApp')
     };
 
     $rootScope.$on('add-card-preview', (event, card) => {
-        $scope.cards.push(card);
+        this.cards.push(card);
+
+        $scope.drawCards();
     });
 
     $scope.cards = [];
 
     $scope.card = {};
+
+    function splitOnManaCostGroups(cards) {
+        const packs = [];
+
+        cards.forEach(card => {
+            if (!packs[card.cost]) {
+                packs[card.cost] = [];
+            }
+
+            packs[card.cost].push(card);
+        });
+
+        return packs;
+    }
 
 }]);

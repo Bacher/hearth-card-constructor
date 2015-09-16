@@ -270,7 +270,7 @@ angular.module('cardsApp')
                 targetsType.modificators.forEach(mod => {
                     raw += '.' + mod.name;
 
-                    if (mod.params) {
+                    if (mod.params && mod.params.length) {
                         raw += '(' + mod.params.join(',') + ')';
                     }
                 });
