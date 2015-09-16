@@ -66,8 +66,12 @@
 
         <label class="line">Custom action: <input ng-model="card.customAction"></label>
 
-        <label class="line">Targets: <input ng-model="card.targetsType" placeholder="not-need"></label>
         <label class="line">Conditions: <input ng-model="card.conditions"></label>
+        <label class="line">Targets: <input ng-model="card.targetsType" placeholder="not-need"></label>
+        <label class="line">Combo: <input ng-model="card.haveCombo" type="checkbox"></label>
+        <label ng-if="card.haveCombo" class="line">
+            Combo Targets: <input ng-model="card.combo.targetsType" placeholder="not-need">
+        </label>
 
         <div class="part object" ng-show="card.type === 1 || card.type === 3" style="margin-top:44px;">
             Object:
@@ -105,15 +109,38 @@
                 </div>
             </div>
 
+            <div ng-if="card.haveCombo" style="margin-top:5px;">Combo Events:
+                <div ng-repeat="(eventTypeName, events) in card.combo.object.events" class="event">
+                    {{eventTypeName}}:
+                    <button ng-click="addComboField(eventTypeName)">+</button>
+                    <label ng-repeat="(index, event) in events" class="line">
+                        <input ng-model="event.event" size="20" ng-show="eventTypeName === 'custom'" placeholder="event">
+                        <input ng-model="event.command" size="30" placeholder="acts">
+                        <input ng-model="event.targetsType" size="30" placeholder="{{eventTypeName === 'battlecry' ? 'inherit' : 'targets'}}">
+                        <button ng-click="removeComboField(eventTypeName, index)">x</button>
+                    </label>
+                </div>
+            </div>
+
         </div>
 
         <div class="part spell" ng-show="card.type === 2">
-            Spell: <button ng-click="addSpellAct()">Add</button>
-            <label class="line" ng-repeat="(id, act) in card.spell.acts">
-                <input ng-model="act.command" size="30" placeholder="acts">
-                <input ng-model="act.targetsType" size="30" placeholder="inherit">
-                <button ng-click="removeSpellAct(id)">x</button>
-            </label>
+            <div>
+                Spells: <button ng-click="addSpellAct()">Add</button>
+                <label class="line" ng-repeat="(id, act) in card.spell.acts">
+                    <input ng-model="act.command" size="30" placeholder="acts">
+                    <input ng-model="act.targetsType" size="30" placeholder="inherit">
+                    <button ng-click="removeSpellAct(id)">x</button>
+                </label>
+            </div>
+            <div ng-if="card.haveCombo">
+                Combo Spells: <button ng-click="addComboSpellAct()">Add</button>
+                <label class="line" ng-repeat="(id, act) in card.combo.spell.acts">
+                    <input ng-model="act.command" size="30" placeholder="acts">
+                    <input ng-model="act.targetsType" size="30" placeholder="inherit">
+                    <button ng-click="removeComboSpellAct(id)">x</button>
+                </label>
+            </div>
         </div>
 
         <div class="part trap" ng-show="card.type === 4">

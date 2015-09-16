@@ -81,30 +81,24 @@ angular.module('cardsApp')
             newCard.conditions = card.conditions.split(',');
         }
 
+        if (card.haveCombo) {
+            newCard.combo = card.combo;
+        }
+
         newCard.targetsType = parseTargetsType(card.targetsType);
+
+        if (card.haveCombo) {
+            newCard.combo.targetsType = parseTargetsType(card.combo.targetsType);
+        }
 
         newCard.flags = getFlags(card.flags);
 
         if (card.type === CARD_TYPES.minion || card.type === CARD_TYPES.weapon) {
-            for (var eventTypeName in card.object.events) {
-                const events = card.object.events;
 
-                events[eventTypeName] = events[eventTypeName].map(event => {
-                    const act = {
-                        acts: parseActCommands(event.command),
-                        targetsType: parseTargetsType(event.targetsType)
-                    };
+            processEventsForSave(card.object.events);
 
-                    if (eventTypeName === 'custom') {
-                        act.event = parseCustomEvent(event.event);
-                    }
-
-                    return act;
-                });
-
-                if (!events[eventTypeName].length) {
-                    delete events[eventTypeName];
-                }
+            if (card.haveCombo) {
+                processEventsForSave(card.combo.object.events);
             }
 
             card.object.flags = getFlags(card.object.flags);
@@ -127,6 +121,15 @@ angular.module('cardsApp')
                     targetsType: parseTargetsType(act.targetsType)
                 };
             });
+
+            if (card.haveCombo) {
+                newCard.combo.spell.acts = card.combo.spell.acts.map(act => {
+                    return {
+                        acts: parseActCommands(act.command),
+                        targetsType: parseTargetsType(act.targetsType)
+                    };
+                });
+            }
         } else if (card.type === CARD_TYPES.trap) {
             newCard.trap = {
                 events: {}
@@ -156,8 +159,16 @@ angular.module('cardsApp')
         $scope.card.minion.events[eventTypeName].push({});
     };
 
+    $scope.addComboField = (eventTypeName) => {
+        $scope.card.combo.object.events[eventTypeName].push({});
+    };
+
     $scope.removeField = (eventTypeName, index) => {
         $scope.card.minion.events[eventTypeName].splice(index, 1);
+    };
+
+    $scope.removeComboField = (eventTypeName, index) => {
+        $scope.card.combo.object.events[eventTypeName].splice(index, 1);
     };
 
     $scope.addSpellAct = () => {
@@ -166,6 +177,14 @@ angular.module('cardsApp')
 
     $scope.removeSpellAct = (id) => {
         $scope.card.spell.acts.splice(id, 1);
+    };
+
+    $scope.addComboSpellAct = () => {
+        $scope.card.combo.spell.acts.push({});
+    };
+
+    $scope.removeComboSpellAct = (id) => {
+        $scope.card.combo.spell.acts.splice(id, 1);
     };
 
     $scope.addTrapAct = () => {
@@ -193,6 +212,16 @@ angular.module('cardsApp')
 
         card.conditions = card.conditions && card.conditions.join(',') || '';
 
+        card.haveCombo = !!card.combo;
+        card.combo = card.combo || {
+            object: {
+                events: {}
+            },
+            spell: {
+                acts: [{}]
+            }
+        };
+
         if (card.type === CARD_TYPES.minion) {
             card.object = card.minion;
 
@@ -204,18 +233,12 @@ angular.module('cardsApp')
 
             card.object.flags = card.object.flags && card.object.flags.join(',') || '';
 
-            const events = card.object.events;
-
-            ['battlecry', 'deathrattle', 'end-turn', 'start-turn', 'aura', 'custom'].forEach(eventTypeName => {
-                if (events[eventTypeName]) {
-                    events[eventTypeName] = events[eventTypeName].map(event => getRawAct(event));
-                } else {
-                    events[eventTypeName] = [];
-                }
-            });
+            fillEvents(card.object.events);
+            fillEvents(card.combo.object.events);
 
         } else if (card.type === CARD_TYPES.spell) {
             card.spell.acts = card.spell.acts.map(act => getRawAct(act));
+            card.combo.spell.acts = card.combo.spell.acts.map(act => getRawAct(act));
 
         } else if (card.type === CARD_TYPES.trap) {
             card.trap.events['custom'] = card.trap.events['custom'].map(act => getRawAct(act));
@@ -342,6 +365,37 @@ angular.module('cardsApp')
         return {
             name: eventMath[1],
             params: eventMath[2] ? eventMath[2].split(',').map(tryParseNumber) : []
+        }
+    }
+
+    function fillEvents(events) {
+        ['battlecry', 'deathrattle', 'end-turn', 'start-turn', 'aura', 'custom'].forEach(eventTypeName => {
+            if (events[eventTypeName]) {
+                events[eventTypeName] = events[eventTypeName].map(event => getRawAct(event));
+            } else {
+                events[eventTypeName] = [];
+            }
+        });
+    }
+
+    function processEventsForSave(events) {
+        for (var eventTypeName in events) {
+            events[eventTypeName] = events[eventTypeName].map(event => {
+                const act = {
+                    acts: parseActCommands(event.command),
+                    targetsType: parseTargetsType(event.targetsType)
+                };
+
+                if (eventTypeName === 'custom') {
+                    act.event = parseCustomEvent(event.event);
+                }
+
+                return act;
+            });
+
+            if (!events[eventTypeName].length) {
+                delete events[eventTypeName];
+            }
         }
     }
 
