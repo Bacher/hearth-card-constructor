@@ -16,6 +16,7 @@ angular.module('cardsApp')
     $scope.drawCards = () => {
          const cards = this.cards.filter(card => {
             const filter = $scope.filter;
+
             if (filter.cardClass) {
                 const clas = filter.cardClass - 1;
                 if (card.clas !== clas) {
@@ -28,6 +29,12 @@ angular.module('cardsApp')
                     return false;
                 }
             }
+
+             if (filter.search) {
+                 if (card.name.toLowerCase().indexOf(filter.search.toLowerCase()) === -1) {
+                    return false;
+                 }
+             }
 
             return true;
         });
@@ -63,7 +70,8 @@ angular.module('cardsApp')
 
     $scope.filter = {
         cardType: 0,
-        cardClass: 0
+        cardClass: 0,
+        search: ''
     };
 
     $rootScope.$on('add-card-preview', (event, card) => {
@@ -78,13 +86,14 @@ angular.module('cardsApp')
 
     function splitOnManaCostGroups(cards) {
         const packs = [];
+        for (var i = 0; i <= 7; ++i) {
+            packs[i] = [];
+        }
 
         cards.forEach(card => {
-            if (!packs[card.cost]) {
-                packs[card.cost] = [];
-            }
+            const cost = card.cost > 7 ? 7 : card.cost;
 
-            packs[card.cost].push(card);
+            packs[cost].push(card);
         });
 
         return packs;
