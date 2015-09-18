@@ -128,17 +128,39 @@
             <div>
                 Spells: <button ng-click="addSpellAct()">Add</button>
                 <label class="line" ng-repeat="(id, act) in card.spell.acts">
-                    <input ng-model="act.command" size="30" placeholder="acts">
+                    <input ng-model="act.command" ng-change="checkCustomFields(act)" size="30" placeholder="acts">
                     <input ng-model="act.targetsType" size="30" placeholder="inherit">
                     <button ng-click="removeSpellAct(id)">x</button>
+
+                    <div ng-if="act.customEvent">
+                        <input ng-model="act.customEvent.event" size="20" placeholder="event">
+                        <input ng-model="act.customEvent.command" size="30" placeholder="acts">
+                        <input ng-model="act.customEvent.targetsType" size="30" placeholder="inherit">
+                    </div>
+
+                    <div ng-if="act.aura">
+                        <input ng-model="act.aura.command" size="30" placeholder="aura">
+                        <input ng-model="act.aura.targetsType" size="30">
+                    </div>
                 </label>
             </div>
             <div ng-if="card.haveCombo">
                 Combo Spells: <button ng-click="addComboSpellAct()">Add</button>
                 <label class="line" ng-repeat="(id, act) in card.combo.spell.acts">
-                    <input ng-model="act.command" size="30" placeholder="acts">
+                    <input ng-model="act.command" ng-change="checkCustomFields(act)" size="30" placeholder="acts">
                     <input ng-model="act.targetsType" size="30" placeholder="inherit">
                     <button ng-click="removeComboSpellAct(id)">x</button>
+
+                    <div ng-if="act.customEvent">
+                        <input ng-model="act.customEvent.event" size="20" placeholder="event">
+                        <input ng-model="act.customEvent.command" size="30" placeholder="acts">
+                        <input ng-model="act.customEvent.targetsType" size="30" placeholder="inherit">
+                    </div>
+
+                    <div ng-if="act.aura">
+                        <input ng-model="act.aura.command" size="30" placeholder="aura">
+                        <input ng-model="act.aura.targetsType" size="30">
+                    </div>
                 </label>
             </div>
         </div>

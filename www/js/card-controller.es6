@@ -64,6 +64,20 @@ angular.module('cardsApp')
         $scope.card.clas = classId;
     };
 
+    $scope.checkCustomFields = act => {
+        if (act.command === 'add-custom-event') {
+            act.customEvent = act.customEvent || {};
+        } else {
+            delete act.customEvent;
+        }
+
+        if (act.command === 'add-aura') {
+            act.aura = act.aura || {}
+        } else {
+            delete act.aura;
+        }
+    };
+
     $scope.saveCard = () => {
         const card = angular.copy($scope.card);
 
@@ -115,20 +129,10 @@ angular.module('cardsApp')
         } else if (card.type === CARD_TYPES.spell) {
             newCard.spell = {};
 
-            newCard.spell.acts = card.spell.acts.map(act => {
-                return {
-                    acts: parseActCommands(act.command),
-                    targetsType: parseTargetsType(act.targetsType)
-                };
-            });
+            newCard.spell.acts = parseActs(card.spell.acts);
 
             if (card.haveCombo) {
-                newCard.combo.spell.acts = card.combo.spell.acts.map(act => {
-                    return {
-                        acts: parseActCommands(act.command),
-                        targetsType: parseTargetsType(act.targetsType)
-                    };
-                });
+                newCard.combo.spell.acts = parseActs(card.combo.spell.acts);
             }
         } else if (card.type === CARD_TYPES.trap) {
             newCard.trap = {
@@ -213,6 +217,7 @@ angular.module('cardsApp')
         card.conditions = card.conditions && card.conditions.join(',') || '';
 
         card.haveCombo = !!card.combo;
+
         card.combo = card.combo || {
             object: {
                 events: {}
@@ -221,6 +226,10 @@ angular.module('cardsApp')
                 acts: []
             }
         };
+
+        if (card.combo && card.combo.targetsType) {
+            card.combo.targetsType = getRawTargetsType(card.combo.targetsType);
+        }
 
         if (card.type === CARD_TYPES.minion) {
             card.object = card.minion;
@@ -348,11 +357,20 @@ angular.module('cardsApp')
             }
         }
 
-        return {
+        const command = {
             event: event,
             command: getRawCommand(act.acts),
             targetsType: getRawTargetsType(act.targetsType)
         };
+
+        if (command.command === 'add-aura') {
+            command.aura = getRawAct(act.aura);
+
+        } else if (command.command === 'add-custom-event') {
+            command.customEvent = getRawAct(act.customEvent);
+        }
+
+        return command;
     }
 
     function getFlags(flagsString) {
@@ -380,23 +398,43 @@ angular.module('cardsApp')
 
     function processEventsForSave(events) {
         for (var eventTypeName in events) {
-            events[eventTypeName] = events[eventTypeName].map(event => {
-                const act = {
-                    acts: parseActCommands(event.command),
-                    targetsType: parseTargetsType(event.targetsType)
-                };
-
-                if (eventTypeName === 'custom') {
-                    act.event = parseCustomEvent(event.event);
-                }
-
-                return act;
-            });
+            events[eventTypeName] = events[eventTypeName].map(event => processEventForSave(event, eventTypeName));
 
             if (!events[eventTypeName].length) {
                 delete events[eventTypeName];
             }
         }
+    }
+
+    function processEventForSave(event, eventTypeName) {
+        const act = {
+            acts: parseActCommands(event.command),
+            targetsType: parseTargetsType(event.targetsType)
+        };
+
+        if (eventTypeName === 'custom') {
+            act.event = parseCustomEvent(event.event);
+        }
+
+        return act;
+    }
+
+    function parseActs(acts) {
+        return acts.map(actRaw => {
+            const act = {
+                acts: parseActCommands(actRaw.command),
+                targetsType: parseTargetsType(actRaw.targetsType)
+            };
+
+            if (actRaw.command === 'add-custom-event') {
+                act.customEvent = processEventForSave(actRaw.customEvent, 'custom');
+
+            } else if (actRaw.command === 'add-aura') {
+                act.aura = processEventForSave(actRaw.aura);
+            }
+
+            return act;
+        });
     }
 
 }]);
