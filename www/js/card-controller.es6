@@ -69,7 +69,7 @@ angular.module('cardsApp')
 
         const newCard = {};
 
-        ['id', 'name', 'cost', 'pic', 'clas', 'type'].forEach(propName => {
+        ['id', 'name', 'cost', 'pic', 'clas', 'type', 'comment'].forEach(propName => {
             newCard[propName] = card[propName];
         });
 
@@ -192,7 +192,7 @@ angular.module('cardsApp')
     };
 
     $scope.removeTrapAct = (id) => {
-        $scope.card.trap.acts.splice(id, 1);
+        $scope.card.trap.events.custom.splice(id, 1);
     };
 
     $rootScope.$on('select-card', (event, card) => {
