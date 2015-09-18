@@ -218,7 +218,7 @@ angular.module('cardsApp')
                 events: {}
             },
             spell: {
-                acts: [{}]
+                acts: []
             }
         };
 
