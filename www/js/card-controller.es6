@@ -65,13 +65,13 @@ angular.module('cardsApp')
     };
 
     $scope.checkCustomFields = act => {
-        if (act.command === 'add-custom-event') {
+        if (_.startsWith(act.command, 'add-custom-event')) {
             act.customEvent = act.customEvent || {};
         } else {
             delete act.customEvent;
         }
 
-        if (act.command === 'add-aura') {
+        if (_.startsWith(act.command, 'add-aura')) {
             act.aura = act.aura || {}
         } else {
             delete act.aura;
@@ -363,10 +363,10 @@ angular.module('cardsApp')
             targetsType: getRawTargetsType(act.targetsType)
         };
 
-        if (command.command === 'add-aura') {
+        if (_.startsWith(command.command, 'add-aura')) {
             command.aura = getRawAct(act.aura);
 
-        } else if (command.command === 'add-custom-event') {
+        } else if (_.startsWith(command.command, 'add-custom-event')) {
             command.customEvent = getRawAct(act.customEvent);
         }
 
@@ -426,10 +426,10 @@ angular.module('cardsApp')
                 targetsType: parseTargetsType(actRaw.targetsType)
             };
 
-            if (actRaw.command === 'add-custom-event') {
+            if (_.startsWith(actRaw.command, 'add-custom-event')) {
                 act.customEvent = processEventForSave(actRaw.customEvent, 'custom');
 
-            } else if (actRaw.command === 'add-aura') {
+            } else if (_.startsWith(actRaw.command, 'add-aura')) {
                 act.aura = processEventForSave(actRaw.aura);
             }
 
