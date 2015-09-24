@@ -54,7 +54,7 @@ angular.module('cardsApp')
         const match = $scope.card.url.match('^http://media-hearth.cursecdn.com/avatars/([^.]+).png$');
 
         if (match) {
-            $scope.card.pic = $scope.card.url = match[1];
+            $scope.card.pic = match[1];
         } else {
             $scope.card.pic = $scope.card.url;
         }
@@ -103,6 +103,10 @@ angular.module('cardsApp')
 
         if (card.haveCombo) {
             newCard.combo.targetsType = parseTargetsType(card.combo.targetsType);
+        }
+
+        if (card.haveChooseAction) {
+            newCard.additionActions = card.additionActions.map(card => card.cardName);
         }
 
         newCard.flags = getFlags(card.flags);
@@ -199,6 +203,10 @@ angular.module('cardsApp')
         $scope.card.trap.events.custom.splice(id, 1);
     };
 
+    $scope.addAdditionAction = () => {
+        $scope.card.additionActions.push({});
+    };
+
     $rootScope.$on('select-card', (event, card) => {
         $scope.card = prepareCard(card);
     });
@@ -229,6 +237,16 @@ angular.module('cardsApp')
 
         if (card.combo && card.combo.targetsType) {
             card.combo.targetsType = getRawTargetsType(card.combo.targetsType);
+        }
+
+        card.haveChooseAction = !!card.additionActions;
+
+        if (card.additionActions) {
+            card.additionActions = card.additionActions.map(cardName => {
+                return { cardName: cardName };
+            });
+        } else {
+            card.additionActions = [{}, {}];
         }
 
         if (card.type === CARD_TYPES.minion) {

@@ -72,8 +72,10 @@ const server = app.listen(8088, function () {
                 return card1.cost - card2.cost;
             } else if (card1.name !== card2.name) {
                 return card1.name.localeCompare(card2.name);
-            } else {
+            } else if (card2.type !== card1.type) {
                 return card2.type - card1.type;
+            } else {
+                return card1.id - card2.id;
             }
         });
 

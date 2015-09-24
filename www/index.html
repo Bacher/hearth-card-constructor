@@ -37,14 +37,14 @@
         <div class="cards">
             <div ng-repeat="cardPack in cards" style="margin-bottom: 70px">
                 <div class="card-preview" ng-repeat="card in cardPack" ng-click="showDetails(card)">
-                    <img ng-src="http://media-hearth.cursecdn.com/avatars/{{card.pic}}.png">
+                    <img ng-src="{{extractCardPic(card.pic)}}">
                 </div>
             </div>
         </div>
     </div>
 
     <div ng-controller="CardController" class="card-panel">
-        <img ng-if="card.pic" class="card-image" ng-src="http://media-hearth.cursecdn.com/avatars/{{card.pic}}.png">
+        <img ng-if="card.pic" class="card-image" ng-src="{{card.url}}">
         <label class="line">ID: {{card.id}}</label>
         <label class="line">Picture: <input ng-model="card.url" ng-change="extractCardPic()"></label>
         <label class="line">Name: <input ng-model="card.name"></label>
@@ -73,6 +73,13 @@
         <label ng-if="card.haveCombo" class="line">
             Combo Targets: <input ng-model="card.combo.targetsType" placeholder="not-need">
         </label>
+        <label class="line">Choose action: <input type="checkbox" ng-model="card.haveChooseAction"></label>
+        <div ng-if="card.haveChooseAction">
+            <button ng-click="addAdditionAction()">+</button>
+            <label ng-repeat="action in card.additionActions" class="line">
+                <input ng-model="action.cardName" placeholder="Card Name">
+            </label>
+        </div>
 
         <div class="part object" ng-show="card.type === 1 || card.type === 3" style="margin-top:44px;">
             Object:

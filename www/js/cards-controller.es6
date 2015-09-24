@@ -46,6 +46,14 @@ angular.module('cardsApp')
         $rootScope.$broadcast('select-card', card);
     };
 
+    $scope.extractCardPic = pic => {
+        if (/^http/.test(pic)) {
+            return pic;
+        } else {
+            return 'http://media-hearth.cursecdn.com/avatars/' + pic + '.png';
+        }
+    };
+
     $scope.cardTypes = [
         'All',
         'Minions',
