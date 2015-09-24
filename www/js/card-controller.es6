@@ -196,7 +196,7 @@ angular.module('cardsApp')
     };
 
     $scope.addTrapAct = () => {
-        $scope.card.trap.acts.push({});
+        $scope.card.trap.events.custom.push({});
     };
 
     $scope.removeTrapAct = (id) => {
@@ -234,6 +234,8 @@ angular.module('cardsApp')
                 acts: []
             }
         };
+
+        card.spell = card.spell || { acts: [] };
 
         if (card.combo && card.combo.targetsType) {
             card.combo.targetsType = getRawTargetsType(card.combo.targetsType);
