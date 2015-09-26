@@ -60,6 +60,18 @@ angular.module('cardsApp')
         }
     };
 
+    $scope.makeCardPic = (pic) => {
+        if (pic) {
+            if (/^http/.test(pic)) {
+                return pic;
+            } else {
+                return `http://media-hearth.cursecdn.com/avatars/${pic}.png`;
+            }
+        } else {
+            return '';
+        }
+    };
+
     $scope.selectClass = classId => {
         $scope.card.clas = classId;
     };
@@ -216,7 +228,7 @@ angular.module('cardsApp')
     function prepareCard(card) {
         card = angular.copy(card);
 
-        card.url = card.pic;
+        card.url = $scope.makeCardPic(card.pic);
 
         card.flags = card.flags && card.flags.join(',') || '';
 
