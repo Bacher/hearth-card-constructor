@@ -99,6 +99,10 @@ angular.module('cardsApp')
             newCard[propName] = card[propName];
         });
 
+        if (card.haveCostCalc) {
+            newCard.costCalc = card.costCalc;
+        }
+
         if (card.customAction) {
             newCard.customAction = card.customAction;
         }
@@ -229,6 +233,8 @@ angular.module('cardsApp')
         card = angular.copy(card);
 
         card.url = $scope.makeCardPic(card.pic);
+
+        card.haveCostCalc = !!card.costCalc;
 
         card.flags = card.flags && card.flags.join(',') || '';
 

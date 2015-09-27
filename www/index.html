@@ -48,7 +48,8 @@
         <label class="line">ID: {{card.id}}</label>
         <label class="line">Picture: <input ng-model="card.url" ng-change="extractCardPic()"></label>
         <label class="line">Name: <input ng-model="card.name"></label>
-        <label class="line">Cost: <input ng-model="card.cost" type="number"></label>
+        <label class="line">Cost: <input ng-model="card.cost" type="number"><input type="checkbox" ng-model="card.haveCostCalc"></label>
+        <label ng-if="card.haveCostCalc" class="line">Cost calc: <input ng-model="card.costCalc"></label>
 
         <label class="line">Type:
             <select ng-model="card.type" ng-options="type.id as type.name for type in cardTypes" convert-to-number></select>
