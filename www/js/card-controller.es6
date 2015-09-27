@@ -145,10 +145,10 @@ angular.module('cardsApp')
         } else if (card.type === CARD_TYPES.spell) {
             newCard.spell = {};
 
-            newCard.spell.acts = parseActs(card.spell.acts);
+            newCard.spell.acts = card.spell.acts.map(act => parseAct(act));
 
             if (card.haveCombo) {
-                newCard.combo.spell.acts = parseActs(card.combo.spell.acts);
+                newCard.combo.spell.acts = card.combo.spell.acts.map(act => parseAct(act));
             }
         } else if (card.type === CARD_TYPES.trap) {
             newCard.trap = {
@@ -430,7 +430,7 @@ angular.module('cardsApp')
 
     function processEventsForSave(events) {
         for (var eventTypeName in events) {
-            events[eventTypeName] = events[eventTypeName].map(event => processEventForSave(event, eventTypeName));
+            events[eventTypeName] = events[eventTypeName].map(event => parseAct(event, eventTypeName));
 
             if (!events[eventTypeName].length) {
                 delete events[eventTypeName];
@@ -438,35 +438,24 @@ angular.module('cardsApp')
         }
     }
 
-    function processEventForSave(event, eventTypeName) {
+    function parseAct(actRaw, eventTypeName) {
         const act = {
-            acts: parseActCommands(event.command),
-            targetsType: parseTargetsType(event.targetsType)
+            acts: parseActCommands(actRaw.command),
+            targetsType: parseTargetsType(actRaw.targetsType)
         };
 
         if (eventTypeName === 'custom') {
             act.event = parseCustomEvent(event.event);
         }
 
+        if (_.startsWith(actRaw.command, 'add-custom-event')) {
+            act.customEvent = parseAct(actRaw.customEvent, 'custom');
+
+        } else if (_.startsWith(actRaw.command, 'add-aura')) {
+            act.aura = parseAct(actRaw.aura);
+        }
+
         return act;
-    }
-
-    function parseActs(acts) {
-        return acts.map(actRaw => {
-            const act = {
-                acts: parseActCommands(actRaw.command),
-                targetsType: parseTargetsType(actRaw.targetsType)
-            };
-
-            if (_.startsWith(actRaw.command, 'add-custom-event')) {
-                act.customEvent = processEventForSave(actRaw.customEvent, 'custom');
-
-            } else if (_.startsWith(actRaw.command, 'add-aura')) {
-                act.aura = processEventForSave(actRaw.aura);
-            }
-
-            return act;
-        });
     }
 
 }]);

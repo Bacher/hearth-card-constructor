@@ -110,9 +110,20 @@
                     <button ng-click="addField(eventTypeName)">+</button>
                     <label ng-repeat="(index, event) in events" class="line">
                         <input ng-model="event.event" size="20" ng-show="eventTypeName === 'custom'" placeholder="event">
-                        <input ng-model="event.command" size="30" placeholder="acts">
+                        <input ng-model="event.command" size="30" placeholder="acts" ng-change="checkCustomFields(event)">
                         <input ng-model="event.targetsType" size="30" placeholder="{{eventTypeName === 'battlecry' ? 'inherit' : 'targets'}}">
                         <button ng-click="removeField(eventTypeName, index)">x</button>
+
+                        <div ng-if="event.customEvent">
+                            <input ng-model="event.customEvent.event" size="20" placeholder="event">
+                            <input ng-model="event.customEvent.command" size="30" placeholder="acts">
+                            <input ng-model="event.customEvent.targetsType" size="30" placeholder="inherit">
+                        </div>
+
+                        <div ng-if="event.aura">
+                            <input ng-model="event.aura.command" size="30" placeholder="aura">
+                            <input ng-model="event.aura.targetsType" size="30">
+                        </div>
                     </label>
                 </div>
             </div>
