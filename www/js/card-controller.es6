@@ -445,7 +445,7 @@ angular.module('cardsApp')
         };
 
         if (eventTypeName === 'custom') {
-            act.event = parseCustomEvent(event.event);
+            act.event = parseCustomEvent(actRaw.event);
         }
 
         if (_.startsWith(actRaw.command, 'add-custom-event')) {
