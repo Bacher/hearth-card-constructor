@@ -112,7 +112,7 @@ angular.module('cardsApp')
         }
 
         if (card.haveCombo) {
-            newCard.combo = card.combo;
+            newCard.combo = angular.copy(card.combo);
         }
 
         newCard.targetsType = parseTargetsType(card.targetsType);
@@ -133,6 +133,8 @@ angular.module('cardsApp')
 
             if (card.haveCombo) {
                 processEventsForSave(card.combo.object.events);
+
+                delete card.combo.spell;
             }
 
             card.object.flags = getFlags(card.object.flags);
@@ -153,6 +155,8 @@ angular.module('cardsApp')
 
             if (card.haveCombo) {
                 newCard.combo.spell.acts = card.combo.spell.acts.map(act => parseAct(act));
+
+                delete newCard.combo.object;
             }
         } else if (card.type === CARD_TYPES.trap) {
             newCard.trap = {
@@ -425,7 +429,7 @@ angular.module('cardsApp')
     }
 
     function fillEvents(events) {
-        ['battlecry', 'deathrattle', 'end-turn', 'start-turn', 'aura', 'custom'].forEach(eventTypeName => {
+        ['battlecry', 'deathrattle', 'end-turn', 'start-turn', 'aura', 'enrage', 'custom'].forEach(eventTypeName => {
             if (events[eventTypeName]) {
                 events[eventTypeName] = events[eventTypeName].map(event => getRawAct(event));
             } else {
