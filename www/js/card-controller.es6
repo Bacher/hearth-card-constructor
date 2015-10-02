@@ -112,7 +112,7 @@ angular.module('cardsApp')
         }
 
         if (card.haveCombo) {
-            newCard.combo = angular.copy(card.combo);
+            newCard.combo = card.combo;
         }
 
         newCard.targetsType = parseTargetsType(card.targetsType);
@@ -134,7 +134,7 @@ angular.module('cardsApp')
             if (card.haveCombo) {
                 processEventsForSave(card.combo.object.events);
 
-                delete card.combo.spell;
+                delete newCard.combo.spell;
             }
 
             card.object.flags = getFlags(card.object.flags);
