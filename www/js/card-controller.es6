@@ -116,6 +116,7 @@ angular.module('cardsApp')
         }
 
         newCard.targetsType = parseTargetsType(card.targetsType);
+        newCard.isTargetsTypeOptional = card.isTargetsTypeOptional;
 
         if (card.haveCombo) {
             newCard.combo.targetsType = parseTargetsType(card.combo.targetsType);
@@ -184,7 +185,7 @@ angular.module('cardsApp')
     };
 
     $scope.addField = (eventTypeName) => {
-        $scope.card.minion.events[eventTypeName].push({});
+        $scope.card.object.events[eventTypeName].push({});
     };
 
     $scope.addComboField = (eventTypeName) => {
@@ -192,7 +193,7 @@ angular.module('cardsApp')
     };
 
     $scope.removeField = (eventTypeName, index) => {
-        $scope.card.minion.events[eventTypeName].splice(index, 1);
+        $scope.card.object.events[eventTypeName].splice(index, 1);
     };
 
     $scope.removeComboField = (eventTypeName, index) => {
@@ -402,7 +403,8 @@ angular.module('cardsApp')
         const command = {
             event: event,
             command: getRawCommand(act.acts),
-            targetsType: getRawTargetsType(act.targetsType)
+            targetsType: getRawTargetsType(act.targetsType),
+            optional: act.optional
         };
 
         if (_.startsWith(command.command, 'add-aura')) {
@@ -453,6 +455,10 @@ angular.module('cardsApp')
             acts: parseActCommands(actRaw.command),
             targetsType: parseTargetsType(actRaw.targetsType)
         };
+
+        if (actRaw.optional) {
+            act.optional = true;
+        }
 
         if (eventTypeName === 'custom') {
             act.event = parseCustomEvent(actRaw.event);
