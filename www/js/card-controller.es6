@@ -108,7 +108,7 @@ angular.module('cardsApp')
         }
 
         if (card.conditions) {
-            newCard.conditions = card.conditions.split(',');
+            newCard.conditions = card.conditions.split(/[,;]/);
         }
 
         if (card.haveCombo) {
@@ -418,7 +418,7 @@ angular.module('cardsApp')
     }
 
     function getFlags(flagsString) {
-        return flagsString && flagsString.split(',') || [];
+        return flagsString && flagsString.split(/,;/) || [];
     }
 
     function parseCustomEvent(event) {
