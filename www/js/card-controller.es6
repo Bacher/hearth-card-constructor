@@ -431,7 +431,7 @@ angular.module('cardsApp')
     }
 
     function fillEvents(events) {
-        ['battlecry', 'deathrattle', 'end-turn', 'start-turn', 'aura', 'enrage', 'custom'].forEach(eventTypeName => {
+        ['battlecry', 'inspire', 'deathrattle', 'end-turn', 'start-turn', 'aura', 'enrage', 'custom'].forEach(eventTypeName => {
             if (events[eventTypeName]) {
                 events[eventTypeName] = events[eventTypeName].map(event => getRawAct(event));
             } else {
