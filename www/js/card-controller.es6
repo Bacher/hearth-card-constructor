@@ -107,8 +107,12 @@ angular.module('cardsApp')
             newCard.customAction = card.customAction;
         }
 
-        if (card.conditions) {
-            newCard.conditions = card.conditions.split(/[,;]/);
+        if (card.playConditions) {
+            newCard.playConditions = card.playConditions.split(/[,;]/);
+        }
+
+        if ((card.type === CARD_TYPES.minion || card.type === CARD_TYPES.weapon) && card.optionalCondition) {
+            newCard.optionalCondition = parseOptionalCondition(card.optionalCondition);
         }
 
         if (card.haveCombo) {
@@ -116,6 +120,8 @@ angular.module('cardsApp')
         }
 
         newCard.targetsType = parseTargetsType(card.targetsType);
+
+
         newCard.isTargetsTypeOptional = card.isTargetsTypeOptional;
 
         if (card.haveCombo) {
@@ -245,7 +251,11 @@ angular.module('cardsApp')
 
         card.targetsType = getRawTargetsType(card.targetsType);
 
-        card.conditions = card.conditions && card.conditions.join(',') || '';
+        if (card.optionalCondition) {
+            card.optionalCondition = getRawOptionalCondition(card.optionalCondition);
+        }
+
+        card.playConditions = card.playConditions && card.playConditions.join(',') || '';
 
         card.haveCombo = !!card.combo;
 
@@ -472,6 +482,19 @@ angular.module('cardsApp')
         }
 
         return act;
+    }
+
+    function parseOptionalCondition(conditionRaw) {
+        const match = conditionRaw.match(/^([^(]+)(?:\(([^)]+)\))?$/);
+
+        return {
+            name: match[1],
+            params: match[2] && match[2].split(/\s*,\s*/).map(tryParseNumber) || []
+        };
+    }
+
+    function getRawOptionalCondition(condition) {
+        return condition.name + (condition.params.length ? '(' + condition.params.join(',') + ')' : '');
     }
 
 }]);
