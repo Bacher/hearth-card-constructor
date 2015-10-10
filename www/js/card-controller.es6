@@ -428,7 +428,7 @@ angular.module('cardsApp')
     }
 
     function getFlags(flagsString) {
-        return flagsString && flagsString.split(/,;/) || [];
+        return flagsString && flagsString.split(/[,;]/) || [];
     }
 
     function parseCustomEvent(event) {
