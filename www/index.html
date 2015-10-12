@@ -30,6 +30,8 @@
                      style="margin-bottom: -6px">
             </label>
 
+            <input type="checkbox" ng-model="filter.unimplemented" ng-change="drawCards()">
+
             <input ng-model="filter.search" ng-change="drawCards()" placeholder="search" type="search">
 
         </div>

@@ -36,6 +36,12 @@ angular.module('cardsApp')
                  }
              }
 
+             if (filter.unimplemented) {
+                 if (!_.contains(card.flags, 'unimplemented')) {
+                     return false;
+                 }
+             }
+
             return true;
         });
 
